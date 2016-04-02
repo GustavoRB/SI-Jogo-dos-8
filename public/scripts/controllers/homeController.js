@@ -3,11 +3,6 @@
  */
 
 app.controller("homeController",['$scope', function ($scope) {
-	/*
-	posicao 11 = 4 possibilidades
-	posicao 01,10,12,21 = 3 possibilidades
-	posicao 00,02,20,22 = 2 possibilidades
-	*/
 
 	var me = this;
 
@@ -45,6 +40,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 	//percorre a fronteira e verifica o elemento de menor custo
 	me.calculaCaminho = function(){
+		console.log("aqui custo", $scope.possiveisJogadas);
 		var menorCusto = $scope.possiveisJogadas[0].custo + $scope.possiveisJogadas[0].custoEstimado;
 		var posicao = 0;
 		for(var index in $scope.possiveisJogadas){
@@ -55,13 +51,14 @@ app.controller("homeController",['$scope', function ($scope) {
 			}
 		}
 
+		var ultimaJogada = $scope.possiveisJogadas[posicao];
 		$scope.jogadasVerificadas.push($scope.possiveisJogadas[posicao]);
 		$scope.possiveisJogadas.splice(posicao, 1);
 
-		if($scope.possiveisJogadas[posicao].estado == me.estadoFinal){	
-			me.calcMenorCaminho($scope.jogadasVerificadas[$scope.jogadasVerificadas.length-1]);
+		if(ultimaJogada == me.estadoFinal){	
+			me.calcMenorCaminho(ultimaJogada);
 		} else {
-			me.proximasJogadas($scope.jogadasVerificadas[$scope.jogadasVerificadas.length-1]);
+			me.proximasJogadas(ultimaJogada);
 		}
 		
 	};
@@ -70,35 +67,97 @@ app.controller("homeController",['$scope', function ($scope) {
 	me.proximasJogadas = function(jogada){
 		var coluna = 0;
 		var linha = 0;
+
+		var novaJogada = {}
+		var novoEstado = {}
+
 		for(var index in jogada.estado){
 			if(jogada.estado[index] == ""){
 				coluna = index%10;
 				linha = (index - coluna)/10;
 
+
 				if(coluna < 2){
 					//o espaço vazio pode passar para a direita
+					novoEstado = jogada.estado;
+					novoEstado[index] = novoEstado[index+1];
+					novoEstado[index+1] = "";
+
+					novaJogada = {
+						estado: novoEstado,
+						custoEstimado: me.calcCustoEstimado(novoEstado),
+						custo: jogada.custo+1,
+						pai: $scope.jogadasVerificadas.length-1
+					};
+
+					$scope.possiveisJogadas.push(novaJogada);
 				}
 				if(coluna > 0){
 					//o espaço vazio pode passar para a esquerda
+					novoEstado = jogada.estado;
+					novoEstado[index] = novoEstado[index-1];
+					novoEstado[index-1] = "";
+
+					novaJogada = {
+						estado: novoEstado,
+						custoEstimado: me.calcCustoEstimado(novoEstado),
+						custo: jogada.custo+1,
+						pai: $scope.jogadasVerificadas.length-1
+					};
+
+					$scope.possiveisJogadas.push(novaJogada);
 				}
 				if(linha < 2){
 					//o espaço vazio pode passar para baixo
+					novoEstado = jogada.estado;
+					novoEstado[index] = novoEstado[index+10];
+					novoEstado[index+10] = "";
+
+					novaJogada = {
+						estado: novoEstado,
+						custoEstimado: me.calcCustoEstimado(novoEstado),
+						custo: jogada.custo+1,
+						pai: $scope.jogadasVerificadas.length-1
+					};
+
+					$scope.possiveisJogadas.push(novaJogada);
 				}
 				if(linha > 0){
 					//o espaço vazio pode passar para cima
+										novoEstado = jogada.estado;
+					novoEstado[index] = novoEstado[index-10];
+					novoEstado[index-10] = "";
+
+					novaJogada = {
+						estado: novoEstado,
+						custoEstimado: me.calcCustoEstimado(novoEstado),
+						custo: jogada.custo+1,
+						pai: $scope.jogadasVerificadas.length-1
+					};
+
+					$scope.possiveisJogadas.push(novaJogada);
 				}
 
 			}
 		}
 
 		me.calculaCaminho();
-	}
+	};
 
 	//percorrer jogadasVerificadas para encontrar o menor caminho e salvar rota em menorCaminho
 	me.calcMenorCaminho = function(jogadaFinal){
-		//o ultimo elemento de jogadasVerificadas é o estado final
-		//percorrer jogadasVerificadas para encontrar o menor caminho e salvar rota em menorCaminho
 		//executar na interface
+
+		var jogadaAnterior = jogadaFinal;
+		for(var x = jogadaFinal.custo; x>=0; x++){
+			
+			$scope.menorCaminho.push(jogadaAnterior.estado);
+			jogadaAnterior = $scope.jogadasVerificadas[jogadaAnterior.pai];
+
+
+		}
+
+		console.log($scope.menorCaminho);
 	};
 
 	//calcula custo estimado
@@ -114,14 +173,15 @@ app.controller("homeController",['$scope', function ($scope) {
 
 		var custoTotal = 0;
 
-		for(var numero in estadoFinal){
+		for(var numero in me.estadoFinal){
 			colunaDesejada = numero%10;
 			linhaDesejada = (numero - colunaDesejada)/10;
 
 			for(var index in estado){
 
-				if(estadoFinal[numero] == estado[index] && numero == index){
-					if(estado[index] == estadoFinal[numero]){
+				if(me.estadoFinal[numero] == estado[index] && numero == index){
+					//calc do  num atual ate sua posicao final
+					if(estado[index] == me.estadoFinal[numero]){
 
 						colunaAtual = index%10;
 						linhaAtual = (index - colunaAtual)/10;
@@ -131,6 +191,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 					}
 
+					//calc do elemento vazio ate num atual 
 					if(estado[index] == ""){
 						
 						colunaDoVazio = index%10;
@@ -148,29 +209,6 @@ app.controller("homeController",['$scope', function ($scope) {
 		return custoTotal;
 	};
 
-	
-
-	//-------------------------------------------------------EXEMPLO---------------------------------------------------
-
-	// $scope.jogadasVerificadas = [
-	// 	{
-	// 		estado: {},
-	// 		custoEstimado: 0,
-	// 		custo: 0,
-	// 		pai: posicao
-	// 	},
-	// 	{},{}
-	// ];
-	// $scope.possiveisJogadas = [
-	// 	{
-	// 		estado: {}, // ou movimento
-	// 		custoEstimado: 0,
-	// 		custo: 0,
-	// 		pai: posicao,
-
-	// 	},
-	// 	{},{}
-	// ];
 
 	//-----------------------------------------VALIDADOR--------------------------------------------------
 	me.numerosEscolhidos = []
@@ -202,9 +240,7 @@ app.controller("homeController",['$scope', function ($scope) {
 				}
 			];
 
-			// me.calculaCaminho();
-
-			console.log("deu certo");
+			me.calculaCaminho();
 		}
 	};
 	//-------------------------------------------------------------------------------------------------------
