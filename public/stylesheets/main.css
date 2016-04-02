@@ -1,0 +1,36 @@
+body {
+  font-family: Century Gothic, sans-serif;
+}
+
+img {
+	width: 95%;
+}
+.tam-content{
+    height: 42em;
+    padding-top: 1em;
+}
+.color-border{
+    border-color: lightskyblue;
+}
+.ulnobullet{
+    list-style: none;
+}
+.centralize{
+    text-align: center;
+}
+
+.jogo-input{
+	margin-bottom: 0.15em;
+	font-size: 2em;
+    width: 2em;
+    height: 2em;
+}
+
+.btn-play{
+    width: 12.6em;
+    margin-bottom: 1em;
+}
+
+.caixa{
+    margin-top: 1em;
+}
