@@ -67,11 +67,11 @@ app.controller("homeController",['$scope', function ($scope) {
 
 
 		if(ultimaJogada.custoEstimado == 0){
-			console.log('!fim');
+			console.log('!fim', ultimaJogada.custoEstimado);
 			me.calcMenorCaminho(ultimaJogada);
 		} else {
 			console.log('proxima fronteira', ultimaJogada);
-			// me.proximasJogadas(ultimaJogada);
+			me.proximasJogadas(ultimaJogada);
 		}
 		
 	};
@@ -81,23 +81,25 @@ app.controller("homeController",['$scope', function ($scope) {
 		var coluna = 0;
 		var linha = 0;
 
-		var novaJogada = {}
-		var novoEstado = {}
+		var novaJogada = {};
+		var novoEstado = {};
 
+		var posicao = 0;
 
 		for(var index in jogada.estado){
-			console.log('passei por isso', index)
 			if(jogada.estado[index] == ""){
+				
 				coluna = index%10;
 				linha = (index - coluna)/10;
 
-				console.log('o vazio esta aqui', index);
-
 				if(coluna < 2){
 					//o espaço vazio pode passar para a direita
-					novoEstado = jogada.estado;
-					novoEstado[index] = novoEstado[index+1];
-					novoEstado[index+1] = "";
+
+					posicao = parseInt(index)+1;
+
+					novoEstado = angular.copy(jogada.estado);
+					novoEstado[index] = novoEstado[posicao];
+					novoEstado[posicao] = "";
 
 					novaJogada = {
 						estado: novoEstado,
@@ -110,12 +112,16 @@ app.controller("homeController",['$scope', function ($scope) {
 					});
 
 					$scope.possiveisJogadas.push(novaJogada);
-				}
+				};
+
 				if(coluna > 0){
 					//o espaço vazio pode passar para a esquerda
-					novoEstado = jogada.estado;
-					novoEstado[index] = novoEstado[index-1];
-					novoEstado[index-1] = "";
+
+					posicao = parseInt(index)-1;
+
+					novoEstado = angular.copy(jogada.estado);
+					novoEstado[index] = novoEstado[posicao];
+					novoEstado[posicao] = "";
 
 					novaJogada = {
 						estado: novoEstado,
@@ -128,12 +134,16 @@ app.controller("homeController",['$scope', function ($scope) {
 					});
 
 					$scope.possiveisJogadas.push(novaJogada);
-				}
+				};
+
 				if(linha < 2){
 					//o espaço vazio pode passar para baixo
-					novoEstado = jogada.estado;
-					novoEstado[index] = novoEstado[index+10];
-					novoEstado[index+10] = "";
+
+					posicao = parseInt(index)+10;
+
+					novoEstado = angular.copy(jogada.estado);
+					novoEstado[index] = novoEstado[posicao];
+					novoEstado[posicao] = "";
 
 					novaJogada = {
 						estado: novoEstado,
@@ -146,12 +156,16 @@ app.controller("homeController",['$scope', function ($scope) {
 					});
 
 					$scope.possiveisJogadas.push(novaJogada);
-				}
+				};
+
 				if(linha > 0){
 					//o espaço vazio pode passar para cima
-										novoEstado = jogada.estado;
-					novoEstado[index] = novoEstado[index-10];
-					novoEstado[index-10] = "";
+
+					posicao = parseInt(index)-10;
+
+					novoEstado = angular.copy(jogada.estado);
+					novoEstado[index] = novoEstado[posicao];
+					novoEstado[posicao] = "";
 
 					novaJogada = {
 						estado: novoEstado,
@@ -164,14 +178,14 @@ app.controller("homeController",['$scope', function ($scope) {
 					});
 
 					$scope.possiveisJogadas.push(novaJogada);
-				}
+				};
 
-			}
-		}
+			};
+		};
 
 		console.log('os novos possiveis', $scope.possiveisJogadas);
 
-		//me.calculaCaminho();
+		me.calculaCaminho();
 	};
 
 	//percorrer jogadasVerificadas para encontrar o menor caminho e salvar rota em menorCaminho
@@ -257,6 +271,9 @@ app.controller("homeController",['$scope', function ($scope) {
 		$scope.possiveisJogadas = [];
 		$scope.menorCaminho = [];
 		me.numerosEscolhidos = [];
+
+		var posicaoEscolhida = angular.copy($scope.posicaoAtual);
+
 		for(var index in me.estadoFinal){
 			me.verificaNumerosEscolhidos(me.estadoFinal[index]);
 		}
@@ -264,21 +281,19 @@ app.controller("homeController",['$scope', function ($scope) {
 		if(me.numerosEscolhidos.length == 9){
 
 			me.primeiro = {
-					estado: $scope.posicaoAtual,
+					estado: posicaoEscolhida,
 					custoEstimado: 0,
 					custo: 0,
 					pai: ""
 				};
 
-			me.calcCustoEstimado($scope.posicaoAtual, function(ret){
+			me.calcCustoEstimado(posicaoEscolhida, function(ret){
 				console.log(ret);
 				me.primeiro.custoEstimado = ret;
 
 				$scope.possiveisJogadas.push(me.primeiro);
 
-				console.log('o primeiro', me.primeiro);
-				
-				console.log("numeros escolhidos", me.numerosEscolhidos);
+				console.log("jogadas", $scope.possiveisJogadas);
 
 				me.calculaCaminho();
 			});
