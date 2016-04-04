@@ -26,6 +26,13 @@ img {
     height: 2em;
 }
 
+.bloco-resultado{
+    font-size: 2em;
+    width: 2em;
+    height: 2em;
+    position: absolute;
+}
+
 .btn-play{
     width: 12.6em;
     margin-bottom: 1em;

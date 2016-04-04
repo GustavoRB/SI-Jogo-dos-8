@@ -235,18 +235,21 @@ app.controller("homeController",['$scope', function ($scope) {
 
 	//percorrer jogadasVerificadas para encontrar o menor caminho e salvar rota em menorCaminho
 	me.calcMenorCaminho = function(jogadaFinal){
-		//executar na interface
 
 		var jogadaAnterior = jogadaFinal;
 		for(var x = jogadaFinal.custo; x>=0; x++){
+
 			$scope.menorCaminho.push(jogadaAnterior.estado);
+
 			if(jogadaAnterior.pai == ""){
 				break;
 			}
+
 			jogadaAnterior = $scope.jogadasVerificadas[jogadaAnterior.pai];
 		}
 
-		console.log($scope.menorCaminho);
+
+		console.log("esse é o menor caminho", $scope.menorCaminho);
 	};
 
 	//calcula custo estimado
