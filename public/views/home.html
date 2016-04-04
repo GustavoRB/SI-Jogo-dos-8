@@ -2,7 +2,7 @@
 	<div class="container">
 		<div class="row">
 			<h1 align="center">Jogo Dos 8</h1>
-			<div class="col-md-6">
+			<div class="col-md-4">
 
 				<input class="text-center jogo-input" type="text" ng-model="posicaoAtual[00]">
 				<input class="text-center jogo-input" type="text" ng-model="posicaoAtual[01]">
@@ -17,11 +17,16 @@
 				<input class="text-center jogo-input" type="text" ng-model="posicaoAtual[22]">
 				<br>
 				<button class="btn btn-info btn-play" ng-click="verificaValido()">Play</button>
+				<br>
+				<button class="btn btn-success btn-play" ng-click="proximoEstado()" ng-disabled="percorreMenorCaminhoStop">Proximo</button>
+				<br>
+				<h4>Fronteira: {{possiveisJogadas.length}}</h4>
+				<h4>Estados Verificados: {{jogadasVerificadas.length}}</h4>
 			</div>
 
-			<div class="col-md-6">
+			<div class="col-md-8">
 
-				<div ng-repeat="caminho in menorCaminho">
+				<div ng-repeat="caminho in menorCaminho.slice().reverse()">
 					<div style="margin-left: 3.4em; margin-top: 4.2em;">
 						<h4 style="margin-left: 0.15em">|</h4>
 						<h4 style="margin-left: 0.15em">|</h4>
@@ -44,6 +49,8 @@
 					<span class="text-center bloco-resultado" style="margin-left: 2em;margin-top: 1em">{{caminho[22]}}</span>
 				</div>
 
+				<div style="margin-bottom: 5em;">
+				</div>
 
 			</div>
 		</div>

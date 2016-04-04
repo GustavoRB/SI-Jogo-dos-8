@@ -46,6 +46,10 @@ app.controller("homeController",['$scope', function ($scope) {
 	$scope.menorCaminho = [];
 	//variavel para impedir loop no sistema
 	me.existeLoop = true;
+	//variavel para percorrer o menor caminho
+	me.percorreMenorCaminho = 0;
+	//variavel para parar de percorrer menor caminho
+	$scope.percorreMenorCaminhoStop = false;
 
 	//percorre a fronteira e verifica o elemento de menor custo
 	me.calculaCaminho = function(){
@@ -62,7 +66,7 @@ app.controller("homeController",['$scope', function ($scope) {
 				menorCusto = custoTotal;
 				posicao = index;
 			}
-		}
+		};
 
 		var ultimaJogada = $scope.possiveisJogadas[posicao];
 		$scope.jogadasVerificadas.push($scope.possiveisJogadas[posicao]);
@@ -241,16 +245,30 @@ app.controller("homeController",['$scope', function ($scope) {
 
 			$scope.menorCaminho.push(jogadaAnterior.estado);
 
-			if(jogadaAnterior.pai == ""){
+			if(jogadaAnterior.pai === ""){
 				break;
 			}
 
 			jogadaAnterior = $scope.jogadasVerificadas[jogadaAnterior.pai];
 		}
 
-
+		
+		me.percorreMenorCaminho = $scope.menorCaminho.length-2;
+		if(me.percorreMenorCaminho >=0){
+			$scope.percorreMenorCaminhoStop = false;
+		} else {
+			$scope.percorreMenorCaminhoStop = true;
+		}
 		console.log("esse é o menor caminho", $scope.menorCaminho);
 	};
+
+	$scope.proximoEstado = function(){
+		$scope.posicaoAtual = $scope.menorCaminho[me.percorreMenorCaminho];
+		me.percorreMenorCaminho --;
+		if(me.percorreMenorCaminho < 0){
+			$scope.percorreMenorCaminhoStop = true;
+		}
+	}
 
 	//calcula custo estimado
 	me.calcCustoEstimado = function(estado, callback){
@@ -335,12 +353,10 @@ app.controller("homeController",['$scope', function ($scope) {
 				};
 
 			me.calcCustoEstimado(posicaoEscolhida, function(ret){
-				console.log(ret);
+
 				me.primeiro.custoEstimado = ret;
 
 				$scope.possiveisJogadas.push(me.primeiro);
-
-				console.log("jogadas", $scope.possiveisJogadas);
 
 				me.calculaCaminho();
 			});
