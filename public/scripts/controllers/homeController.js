@@ -44,6 +44,8 @@ app.controller("homeController",['$scope', function ($scope) {
 	$scope.possiveisJogadas = [];
 	//o melhor caminho para o resultado
 	$scope.menorCaminho = [];
+	//variavel para impedir loop no sistema
+	me.existeLoop = true;
 
 	//percorre a fronteira e verifica o elemento de menor custo
 	me.calculaCaminho = function(){
@@ -55,6 +57,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 		for(var index in $scope.possiveisJogadas){
 			var custoTotal = $scope.possiveisJogadas[index].custo + $scope.possiveisJogadas[index].custoEstimado;
+			console.log("custo", $scope.possiveisJogadas[index].custo, $scope.possiveisJogadas[index].custoEstimado);
 			if(menorCusto > custoTotal){
 				menorCusto = custoTotal;
 				posicao = index;
@@ -83,8 +86,9 @@ app.controller("homeController",['$scope', function ($scope) {
 
 		var novaJogada = {};
 		var novoEstado = {};
-
 		var posicao = 0;
+
+		var novasPossiveisJogadas = [];
 
 		for(var index in jogada.estado){
 			if(jogada.estado[index] == ""){
@@ -111,7 +115,7 @@ app.controller("homeController",['$scope', function ($scope) {
 						novaJogada.custoEstimado = ret;
 					});
 
-					$scope.possiveisJogadas.push(novaJogada);
+					novasPossiveisJogadas.push(novaJogada);
 				};
 
 				if(coluna > 0){
@@ -133,7 +137,7 @@ app.controller("homeController",['$scope', function ($scope) {
 						novaJogada.custoEstimado = ret;
 					});
 
-					$scope.possiveisJogadas.push(novaJogada);
+					novasPossiveisJogadas.push(novaJogada);
 				};
 
 				if(linha < 2){
@@ -155,7 +159,7 @@ app.controller("homeController",['$scope', function ($scope) {
 						novaJogada.custoEstimado = ret;
 					});
 
-					$scope.possiveisJogadas.push(novaJogada);
+					novasPossiveisJogadas.push(novaJogada);
 				};
 
 				if(linha > 0){
@@ -177,15 +181,56 @@ app.controller("homeController",['$scope', function ($scope) {
 						novaJogada.custoEstimado = ret;
 					});
 
-					$scope.possiveisJogadas.push(novaJogada);
+					novasPossiveisJogadas.push(novaJogada);
 				};
 
 			};
 		};
 
+
+		for(var index in novasPossiveisJogadas){
+
+			me.quebraLoop(novasPossiveisJogadas[index].estado);
+
+			if(me.existeLoop == false){
+				$scope.possiveisJogadas.push(novasPossiveisJogadas[index]);
+			}
+
+		};
+
 		console.log('os novos possiveis', $scope.possiveisJogadas);
 
 		me.calculaCaminho();
+	};
+
+	//remove novas possiveis jogadas que ja foram verificadas anteriormente
+	me.quebraLoop = function(estado){
+
+		var jogadasFeitas = angular.copy($scope.jogadasVerificadas);
+		var quemDevoRemover = [];
+
+		me.existeLoop = true;
+
+		for(var numero in estado){
+
+			//verifica todos que devem ser removidos
+			for(var index in jogadasFeitas){
+
+				if(estado[numero] != jogadasFeitas[index].estado[numero]){
+					quemDevoRemover.push(index);
+				}
+			}
+
+			//remove os verificados
+			for(var remove = quemDevoRemover.length-1; remove >=0; remove--){
+				jogadasFeitas.splice(quemDevoRemover[remove], 1);
+			};
+
+			if(jogadasFeitas.length == 0){
+				me.existeLoop = false;
+				break;
+			}
+		}
 	};
 
 	//percorrer jogadasVerificadas para encontrar o menor caminho e salvar rota em menorCaminho
@@ -247,7 +292,6 @@ app.controller("homeController",['$scope', function ($scope) {
 			}
 		}
 
-		console.log('calculando', custoTotal);
 		callback(custoTotal);
 	};
 
