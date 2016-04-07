@@ -51,6 +51,8 @@ app.controller("homeController",['$scope', function ($scope) {
 	//variavel para parar de percorrer menor caminho
 	$scope.percorreMenorCaminhoStop = false;
 
+	$scope.um = 0;
+
 	//percorre a fronteira e verifica o elemento de menor custo
 	me.calculaCaminho = function(){
 
@@ -62,9 +64,14 @@ app.controller("homeController",['$scope', function ($scope) {
 		for(var index in $scope.possiveisJogadas){
 			var custoTotal = $scope.possiveisJogadas[index].custo + $scope.possiveisJogadas[index].custoEstimado;
 			console.log("custo", $scope.possiveisJogadas[index].custo, $scope.possiveisJogadas[index].custoEstimado);
+			console.log('loop', index, menorCusto, posicao, custoTotal);
 			if(menorCusto > custoTotal){
 				menorCusto = custoTotal;
 				posicao = index;
+			}
+
+			if(index > 3){
+				return;
 			}
 		};
 
@@ -262,6 +269,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		console.log("esse é o menor caminho", $scope.menorCaminho);
 	};
 
+	//usado para mostrar o proximo estado do jogo
 	$scope.proximoEstado = function(){
 		$scope.posicaoAtual = $scope.menorCaminho[me.percorreMenorCaminho];
 		me.percorreMenorCaminho --;
@@ -287,7 +295,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		for(var index in estado){
 			if(estado[index] == ""){
 				colunaDoVazio = index%10;
-				linhaDoVazio = (index - colunaDoVazio)/10;		
+				linhaDoVazio = (index - colunaDoVazio)/10;
 			}
 		}
 
@@ -296,9 +304,8 @@ app.controller("homeController",['$scope', function ($scope) {
 			linhaDesejada = (numero - colunaDesejada)/10;
 
 			for(var index in estado){
-
 				if(me.estadoFinal[numero] == estado[index] && numero != index){
-					//calc do  num atual ate sua posicao final
+					//calc do num atual ate sua posicao final
 					colunaAtual = index%10;
 					linhaAtual = (index - colunaAtual)/10;
 
@@ -336,6 +343,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		$scope.possiveisJogadas = [];
 		$scope.menorCaminho = [];
 		me.numerosEscolhidos = [];
+		$scope.um = 1;
 
 		var posicaoEscolhida = angular.copy($scope.posicaoAtual);
 
@@ -350,13 +358,15 @@ app.controller("homeController",['$scope', function ($scope) {
 					custoEstimado: 0,
 					custo: 0,
 					pai: ""
-				};
+			};
 
 			me.calcCustoEstimado(posicaoEscolhida, function(ret){
 
 				me.primeiro.custoEstimado = ret;
 
 				$scope.possiveisJogadas.push(me.primeiro);
+
+				console.log("heuristica", me.primeiro);
 
 				me.calculaCaminho();
 			});

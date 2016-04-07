@@ -10,7 +10,7 @@ function ConfigRotas($routeProvider) {
 
     me.wiring = function(){
 
-        me.route.when('/', {templateUrl: '../views/home.html', controller: 'homeController'});
+        me.route.when('/', {templateUrl: '../views/home.html', controller: 'jogoController'});
         SIOM.on('setarota', me.setaRota.bind(me));
     };
     
