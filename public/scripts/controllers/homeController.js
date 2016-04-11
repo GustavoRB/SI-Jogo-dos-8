@@ -11,31 +11,31 @@ app.controller("homeController",['$scope', function ($scope) {
 	var me = this;
 
 	me.estadoFinal = {
-		00: "1",
-		01: "2",
-		02: "3",
+		00: 1,
+		01: 2,
+		02: 3,
 
-		10: "8",
-		11: "",
-		12: "4",
+		10: 8,
+		11: null,
+		12: 4,
 
-		20: "7",
-		21: "6",
-		22: "5"
+		20: 7,
+		21: 6,
+		22: 5
 	};
 
 	$scope.posicaoAtual = {
-		00: "",
-		01: "",
-		02: "",
+		00: null,
+		01: null,
+		02: null,
 
-		10: "",
-		11: "",
-		12: "",
+		10: null,
+		11: null,
+		12: null,
 
-		20: "",
-		21: "",
-		22: ""
+		20: null,
+		21: null,
+		22: null
 	};
 
 	//jogadas que ja foram verificadas
@@ -58,24 +58,26 @@ app.controller("homeController",['$scope', function ($scope) {
 
 		var menorCusto = $scope.possiveisJogadas[0].custo + $scope.possiveisJogadas[0].custoEstimado;
 		var posicao = 0;
+		var custoTotal = 0;
 
 		console.log("fronteira", $scope.possiveisJogadas);
 
 		for(var index in $scope.possiveisJogadas){
-			var custoTotal = $scope.possiveisJogadas[index].custo + $scope.possiveisJogadas[index].custoEstimado;
-			console.log("custo", $scope.possiveisJogadas[index].custo, $scope.possiveisJogadas[index].custoEstimado);
-			console.log('loop', index, menorCusto, posicao, custoTotal);
+			custoTotal = $scope.possiveisJogadas[index].custo + $scope.possiveisJogadas[index].custoEstimado;
+
+			if($scope.possiveisJogadas[index].custo >= 30){
+				$scope.possiveisJogadas.splice(index, 1);
+			}
+
 			if(menorCusto > custoTotal){
 				menorCusto = custoTotal;
 				posicao = index;
 			}
 
-			if(index > 3){
-				return;
-			}
 		};
 
 		var ultimaJogada = $scope.possiveisJogadas[posicao];
+
 		$scope.jogadasVerificadas.push($scope.possiveisJogadas[posicao]);
 		$scope.possiveisJogadas.splice(posicao, 1);
 
@@ -102,7 +104,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		var novasPossiveisJogadas = [];
 
 		for(var index in jogada.estado){
-			if(jogada.estado[index] == ""){
+			if(jogada.estado[index] == null){
 				
 				coluna = index%10;
 				linha = (index - coluna)/10;
@@ -114,7 +116,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 					novoEstado = angular.copy(jogada.estado);
 					novoEstado[index] = novoEstado[posicao];
-					novoEstado[posicao] = "";
+					novoEstado[posicao] = null;
 
 					novaJogada = {
 						estado: novoEstado,
@@ -136,7 +138,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 					novoEstado = angular.copy(jogada.estado);
 					novoEstado[index] = novoEstado[posicao];
-					novoEstado[posicao] = "";
+					novoEstado[posicao] = null;
 
 					novaJogada = {
 						estado: novoEstado,
@@ -158,7 +160,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 					novoEstado = angular.copy(jogada.estado);
 					novoEstado[index] = novoEstado[posicao];
-					novoEstado[posicao] = "";
+					novoEstado[posicao] = null;
 
 					novaJogada = {
 						estado: novoEstado,
@@ -180,7 +182,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 					novoEstado = angular.copy(jogada.estado);
 					novoEstado[index] = novoEstado[posicao];
-					novoEstado[posicao] = "";
+					novoEstado[posicao] = null;
 
 					novaJogada = {
 						estado: novoEstado,
@@ -204,6 +206,7 @@ app.controller("homeController",['$scope', function ($scope) {
 			me.quebraLoop(novasPossiveisJogadas[index].estado);
 
 			if(me.existeLoop == false){
+				console.log("custo", novasPossiveisJogadas[index]);
 				$scope.possiveisJogadas.push(novasPossiveisJogadas[index]);
 			}
 
@@ -252,7 +255,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 			$scope.menorCaminho.push(jogadaAnterior.estado);
 
-			if(jogadaAnterior.pai === ""){
+			if(jogadaAnterior.pai === null){
 				break;
 			}
 
@@ -293,7 +296,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		var custoTotal = 0;
 
 		for(var index in estado){
-			if(estado[index] == ""){
+			if(estado[index] == null){
 				colunaDoVazio = index%10;
 				linhaDoVazio = (index - colunaDoVazio)/10;
 			}
@@ -357,7 +360,7 @@ app.controller("homeController",['$scope', function ($scope) {
 					estado: posicaoEscolhida,
 					custoEstimado: 0,
 					custo: 0,
-					pai: ""
+					pai: null
 			};
 
 			me.calcCustoEstimado(posicaoEscolhida, function(ret){
@@ -366,7 +369,7 @@ app.controller("homeController",['$scope', function ($scope) {
 
 				$scope.possiveisJogadas.push(me.primeiro);
 
-				console.log("heuristica", me.primeiro);
+				console.log("primeira jogada", me.primeiro);
 
 				me.calculaCaminho();
 			});
@@ -377,5 +380,5 @@ app.controller("homeController",['$scope', function ($scope) {
 
 	};
 	//-------------------------------------------------------------------------------------------------------
-
+	
 }]);
