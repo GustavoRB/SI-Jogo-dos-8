@@ -16,12 +16,13 @@
 				<input class="text-center jogo-input" type="number" ng-model="posicaoAtual[21]">
 				<input class="text-center jogo-input" type="number" ng-model="posicaoAtual[22]">
 				<br>
-				<button class="btn btn-info btn-play" ng-click="verificaValido()">Play</button>
+				<button class="btn btn-info btn-play" ng-click="verificaValido()">Iniciar</button>
 				<br>
 				<button class="btn btn-success btn-play" ng-click="proximoEstado()" ng-disabled="percorreMenorCaminhoStop">Proximo</button>
 				<br>
 				<h4>Fronteira: {{possiveisJogadas.length+um}}</h4>
 				<h4>Estados Verificados: {{jogadasVerificadas.length}}</h4>
+				<h4>Número de jogadas: {{menorCaminho.length}}</h4>
 			</div>
 
 			<div class="col-md-8">

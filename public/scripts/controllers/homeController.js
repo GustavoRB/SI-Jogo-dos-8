@@ -46,6 +46,8 @@ app.controller("homeController",['$scope', function ($scope) {
 	$scope.menorCaminho = [];
 	//variavel para impedir loop no sistema
 	me.existeLoop = true;
+	//define um limite para a profundidade da busca
+	me.nodoLimite = 30;
 	//variavel para percorrer o menor caminho
 	me.percorreMenorCaminho = 0;
 	//variavel para parar de percorrer menor caminho
@@ -65,7 +67,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		for(var index in $scope.possiveisJogadas){
 			custoTotal = $scope.possiveisJogadas[index].custo + $scope.possiveisJogadas[index].custoEstimado;
 
-			if($scope.possiveisJogadas[index].custo >= 30){
+			if($scope.possiveisJogadas[index].custo >= me.nodoLimite){
 				$scope.possiveisJogadas.splice(index, 1);
 			}
 
@@ -295,12 +297,12 @@ app.controller("homeController",['$scope', function ($scope) {
 
 		var custoTotal = 0;
 
-		for(var index in estado){
-			if(estado[index] == null){
-				colunaDoVazio = index%10;
-				linhaDoVazio = (index - colunaDoVazio)/10;
-			}
-		}
+		// for(var index in estado){
+		// 	if(estado[index] == null){
+		// 		colunaDoVazio = index%10;
+		// 		linhaDoVazio = (index - colunaDoVazio)/10;
+		// 	}
+		// }
 
 		for(var numero in me.estadoFinal){
 			colunaDesejada = numero%10;
@@ -315,14 +317,17 @@ app.controller("homeController",['$scope', function ($scope) {
 					custoTotal += Math.abs(colunaDesejada - colunaAtual);
 					custoTotal += Math.abs(linhaDesejada - linhaAtual);
 
+					//elementos fora do lugar
+					custoTotal ++;
+
 					//calc do elemento vazio ate num atual
-					custoTotal += Math.abs(colunaAtual - colunaDoVazio);
-					custoTotal += Math.abs(linhaAtual - linhaDoVazio);				
+					// custoTotal += Math.abs(colunaAtual - colunaDoVazio);
+					// custoTotal += Math.abs(linhaAtual - linhaDoVazio);				
 					
 				}
 			}
 		}
-
+		
 		callback(custoTotal);
 	};
 
@@ -346,7 +351,7 @@ app.controller("homeController",['$scope', function ($scope) {
 		$scope.possiveisJogadas = [];
 		$scope.menorCaminho = [];
 		me.numerosEscolhidos = [];
-		$scope.um = 1;
+		
 
 		var posicaoEscolhida = angular.copy($scope.posicaoAtual);
 
@@ -355,6 +360,8 @@ app.controller("homeController",['$scope', function ($scope) {
 		}
 
 		if(me.numerosEscolhidos.length == 9){
+
+			$scope.um = 1;
 
 			me.primeiro = {
 					estado: posicaoEscolhida,
